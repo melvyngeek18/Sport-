@@ -1,0 +1,8 @@
+{
+  "name": "FireFit Ops - Sapeur-Pompier Pro",
+  "description": "Une application de suivi de condition physique et de santé conçue spécifiquement pour les sapeurs-pompiers, incluant des programmes d'entraînement opérationnels, un suivi de santé critique et des analyses par IA.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
