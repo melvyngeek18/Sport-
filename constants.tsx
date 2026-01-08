@@ -3,13 +3,13 @@ import React from 'react';
 import { Workout } from './types';
 
 export const COLORS = {
-  primary: '#f48c25',
-  background: '#181411',
-  surface: '#27211b',
-  border: '#393028',
-  textSecondary: '#baab9c',
-  success: '#0bda16',
-  danger: '#fa3f38',
+  primary: '#dc2626',
+  background: '#0a1128',
+  surface: '#1a2238',
+  border: '#2d3a5a',
+  textSecondary: '#94a3b8',
+  success: '#10b981',
+  danger: '#ef4444',
   warning: '#f59e0b',
 };
 
@@ -18,7 +18,6 @@ export const MOCK_WORKOUTS: Workout[] = [
     id: 'c1-s1',
     title: 'Force Bas du Corps + Metcon',
     type: 'CrossFit',
-    // Fix missing timerType and status properties to satisfy the Workout interface
     timerType: 'AMRAP',
     status: 'scheduled',
     duration: '60 min',
@@ -37,7 +36,6 @@ export const MOCK_WORKOUTS: Workout[] = [
     id: 'c1-s2',
     title: 'Running Endurance',
     type: 'Cardio',
-    // Fix missing timerType and status properties to satisfy the Workout interface
     timerType: 'STANDARD',
     status: 'scheduled',
     duration: '50 min',
@@ -55,7 +53,6 @@ export const MOCK_WORKOUTS: Workout[] = [
     id: 'c1-s3',
     title: 'Gym / Haut du Corps',
     type: 'CrossFit',
-    // Fix missing timerType and status properties to satisfy the Workout interface
     timerType: 'AMRAP',
     status: 'scheduled',
     duration: '45 min',
