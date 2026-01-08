@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
+import { speakEncouragement } from '../services/geminiService';
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Profile: React.FC = () => {
   
   // État local temporaire pour l'édition
   const [localData, setLocalData] = useState(user);
+  const [isTestingVoice, setIsTestingVoice] = useState(false);
 
   // Synchroniser l'état local si l'utilisateur global change
   useEffect(() => {
@@ -61,6 +63,15 @@ const Profile: React.FC = () => {
     updateUser({ voicePreference: voice });
   };
 
+  const handleTestVoice = async () => {
+    setIsTestingVoice(true);
+    const message = user.voicePreference === 'female' 
+      ? "Bonjour, je suis votre coach. Prête pour l'entraînement ?" 
+      : "Bonjour, je suis votre coach. Prêt pour l'entraînement ?";
+    await speakEncouragement(message);
+    setIsTestingVoice(false);
+  };
+
   return (
     <div className="flex-1 pb-24 overflow-y-auto no-scrollbar">
       <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
@@ -98,7 +109,7 @@ const Profile: React.FC = () => {
           </div>
         ) : (
           <>
-            <h3 className="text-2xl font-black mt-4">{user.name}</h3>
+            <h3 className="text-2xl font-black mt-4">{user.name || 'Soldat'}</h3>
             <p className="text-text-secondary text-sm font-bold tracking-wider uppercase mt-1">{user.rank} • {user.age} ans</p>
           </>
         )}
@@ -116,7 +127,7 @@ const Profile: React.FC = () => {
             <p className="text-center font-black leading-tight text-sm">
               {stat.val} <span className="text-[10px] font-normal text-text-secondary">{stat.unit}</span>
             </p>
-            <p className="text-[9px] text-text-secondary font-bold uppercase tracking-widest">{stat.label}</p>
+            <p className="text-[9px] text-text-secondary font-bold uppercase tracking-widest text-center">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -189,7 +200,19 @@ const Profile: React.FC = () => {
               {/* Voice Preference Choice */}
               {user.guidageAudioEnabled && (
                 <div className="mt-4 pt-4 border-t border-white/5 flex flex-col gap-3 animate-in slide-in-from-top-2 duration-300">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary ml-1">Genre de la voix</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary ml-1">Genre de la voix</p>
+                    <button 
+                      onClick={handleTestVoice}
+                      disabled={isTestingVoice}
+                      className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all disabled:opacity-50"
+                    >
+                      <span className={`material-symbols-outlined text-sm ${isTestingVoice ? 'animate-spin' : ''}`}>
+                        {isTestingVoice ? 'progress_activity' : 'volume_up'}
+                      </span>
+                      {isTestingVoice ? 'Chargement...' : 'Tester la voix'}
+                    </button>
+                  </div>
                   <div className="flex gap-2">
                     <button 
                       onClick={() => setVoice('male')}

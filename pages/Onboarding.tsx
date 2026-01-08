@@ -12,7 +12,7 @@ const Onboarding: React.FC = () => {
     age: '30',
     weight: '80',
     height: '180',
-    photoUrl: 'https://picsum.photos/seed/firefighter/200/200', // Photo par défaut
+    photoUrl: 'https://img.freepik.com/vecteurs-premium/concept-logo-lettre-s-feu-abstrait_73229-456.jpg', // Logo SC par défaut
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -59,7 +59,7 @@ const Onboarding: React.FC = () => {
           <div className="space-y-6 animate-in slide-in-from-right duration-300">
             <h2 className="text-xl font-bold text-center">Qui êtes-vous ?</h2>
             
-            {/* Photo Upload Section */}
+            {/* Photo Upload Section avec Logo SC par défaut */}
             <div className="flex flex-col items-center gap-3">
               <div className="relative group cursor-pointer" onClick={handlePhotoClick}>
                 <div className="w-28 h-28 rounded-full border-4 border-primary/30 overflow-hidden bg-background-dark flex items-center justify-center shadow-inner">
@@ -73,7 +73,7 @@ const Onboarding: React.FC = () => {
                   <span className="material-symbols-outlined text-sm font-bold">photo_camera</span>
                 </div>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-primary">Ajouter une photo</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-primary">Changer la photo (Logo SC actuel)</p>
               <input 
                 type="file" 
                 ref={fileInputRef} 

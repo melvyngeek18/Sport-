@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getWorkoutAnalysis } from '../services/geminiService';
 
 interface WorkoutSummary {
   id: string;
@@ -13,9 +14,16 @@ interface WorkoutSummary {
   exercises: { name: string; result: string }[];
 }
 
+interface AIAnalysis {
+  summary: string;
+  tips: string[];
+}
+
 const History: React.FC = () => {
   const navigate = useNavigate();
   const [selectedSummary, setSelectedSummary] = useState<WorkoutSummary | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
 
   const mockHistories: WorkoutSummary[] = [
     {
@@ -63,10 +71,21 @@ const History: React.FC = () => {
 
   const openSummary = (summary: WorkoutSummary) => {
     setSelectedSummary(summary);
+    setAiAnalysis(null);
   };
 
   const closeSummary = () => {
     setSelectedSummary(null);
+    setAiAnalysis(null);
+    setIsAnalyzing(false);
+  };
+
+  const handleAnalyze = async () => {
+    if (!selectedSummary) return;
+    setIsAnalyzing(true);
+    const analysis = await getWorkoutAnalysis(selectedSummary);
+    setAiAnalysis(analysis);
+    setIsAnalyzing(false);
   };
 
   return (
@@ -132,9 +151,9 @@ const History: React.FC = () => {
       {/* Workout Summary Modal */}
       {selectedSummary && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background-dark/90 backdrop-blur-xl animate-in fade-in duration-200">
-          <div className="w-full max-w-sm bg-surface-dark border border-white/10 rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in slide-in-from-bottom-8 duration-300">
+          <div className="w-full max-w-sm bg-surface-dark border border-white/10 rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in slide-in-from-bottom-8 duration-300 max-h-[90vh] flex flex-col">
             {/* Header with Background */}
-            <div className="relative h-32 bg-primary flex flex-col items-center justify-center text-white">
+            <div className="relative min-h-[128px] bg-primary flex flex-col items-center justify-center text-white shrink-0">
               <div className="absolute top-4 right-4">
                 <button onClick={closeSummary} className="size-8 rounded-full bg-background-dark/10 flex items-center justify-center">
                    <span className="material-symbols-outlined font-bold">close</span>
@@ -145,7 +164,7 @@ const History: React.FC = () => {
               <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">{selectedSummary.date}</p>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 overflow-y-auto no-scrollbar flex-1">
               {/* Main Title & Intensity */}
               <div className="text-center">
                 <h4 className="text-2xl font-black leading-tight mb-1">{selectedSummary.title}</h4>
@@ -179,10 +198,44 @@ const History: React.FC = () => {
                 </div>
               </div>
 
+              {/* AI Coach Analysis Trigger & Area */}
+              <div className="pt-4 border-t border-white/5 space-y-4">
+                {!aiAnalysis && !isAnalyzing ? (
+                  <button 
+                    onClick={handleAnalyze}
+                    className="w-full bg-surface-dark border border-primary/30 py-3 rounded-2xl flex items-center justify-center gap-2 group hover:bg-primary/5 transition-all"
+                  >
+                    <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">psychology</span>
+                    <span className="text-xs font-black uppercase tracking-widest text-white">Analyse Coach IA</span>
+                  </button>
+                ) : isAnalyzing ? (
+                  <div className="flex flex-col items-center justify-center py-4 gap-2">
+                    <div className="size-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">Analyse en cours...</p>
+                  </div>
+                ) : (
+                  <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 animate-in fade-in slide-in-from-top-2">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="material-symbols-outlined text-primary text-xl">smart_toy</span>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-primary">Conseils du Coach IA</p>
+                    </div>
+                    <p className="text-xs text-white leading-relaxed italic mb-4">"{aiAnalysis?.summary}"</p>
+                    <div className="space-y-2">
+                      {aiAnalysis?.tips.map((tip, idx) => (
+                        <div key={idx} className="flex gap-3">
+                          <span className="material-symbols-outlined text-primary text-sm mt-0.5">trending_up</span>
+                          <p className="text-[11px] font-medium text-text-secondary leading-normal">{tip}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Close Button */}
               <button 
                 onClick={closeSummary}
-                className="w-full bg-primary text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl active:scale-95 transition-all mt-4"
+                className="w-full bg-primary text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl active:scale-95 transition-all"
               >
                 Quitter
               </button>

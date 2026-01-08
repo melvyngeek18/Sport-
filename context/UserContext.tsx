@@ -14,6 +14,7 @@ interface UserContextType {
   replaceWorkout: (id: string, workoutData: Partial<Workout>) => void;
 }
 
+// L'image par défaut est le logo SC (stylisé avec du feu comme sur l'image fournie)
 const defaultUser: UserProfile = {
   name: '',
   rank: 'Sapeur',
@@ -21,7 +22,7 @@ const defaultUser: UserProfile = {
   weight: '',
   height: '',
   objective: 'Relance cardio & Perte de poids',
-  photoUrl: 'https://picsum.photos/seed/firefighter/200/200',
+  photoUrl: 'https://img.freepik.com/vecteurs-premium/concept-logo-lettre-s-feu-abstrait_73229-456.jpg', 
   notificationsEnabled: true,
   guidageAudioEnabled: true,
   voicePreference: 'male',
@@ -73,11 +74,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const newUser = { ...user, ...data, isInitialized: true };
     setUser(newUser);
     
-    // Génération d'un programme de base à partir des mocks
     const today = new Date();
     const generatedProgram: Workout[] = MOCK_WORKOUTS.map((w, i) => {
       const workoutDate = new Date(today);
-      workoutDate.setDate(today.getDate() + (i * 2)); // Séance tous les 2 jours
+      workoutDate.setDate(today.getDate() + (i * 2));
       return {
         ...w,
         id: `pw-${i}`,
