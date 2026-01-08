@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { LineChart, Line, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { COLORS } from '../constants';
 import { useUser } from '../context/UserContext';
@@ -34,6 +34,32 @@ const HealthTracking: React.FC = () => {
     weight: user.weight,
     heartRate: 60,
     bloodPressure: { systolic: 120, diastolic: 80 }
+  };
+
+  // Calcul de la tendance du poids
+  const weightTrend = useMemo(() => {
+    if (healthHistory.length < 2) return { label: 'Stable', color: 'text-white', icon: 'remove' };
+    
+    const latest = healthHistory[healthHistory.length - 1].weight;
+    const previous = healthHistory[healthHistory.length - 2].weight;
+
+    if (latest < previous) {
+      return { label: 'Baisse', color: 'text-success', icon: 'trending_down' };
+    } else if (latest > previous) {
+      return { label: 'Hausse', color: 'text-danger', icon: 'trending_up' };
+    } else {
+      return { label: 'Stable', color: 'text-white', icon: 'remove' };
+    }
+  }, [healthHistory]);
+
+  const renderStatusIcon = () => {
+    // Utilisation d'une icône de santé globale comme demandé
+    return (
+      <div className="flex flex-col items-center gap-1 text-primary transition-all duration-500">
+        <span className="material-symbols-outlined filled text-3xl">health_and_safety</span>
+        <span className="text-[8px] font-black uppercase tracking-widest">Santé Ops</span>
+      </div>
+    );
   };
 
   return (
@@ -106,22 +132,28 @@ const HealthTracking: React.FC = () => {
       {/* TopBar */}
       <header className="sticky top-0 z-50 bg-background-dark/95 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-white/5">
         <h1 className="text-lg font-bold tracking-tight text-center flex-1">Suivi Poids & Santé</h1>
-        <button className="p-2 rounded-full hover:bg-white/5">
-          <span className="material-symbols-outlined text-2xl">notifications</span>
-        </button>
+        <div className="shrink-0 min-w-[50px] flex justify-end">
+          {renderStatusIcon()}
+        </div>
       </header>
 
       {/* Date Range Selector */}
       <div className="px-4 py-4 flex gap-3 overflow-x-auto no-scrollbar">
-        {['7j', '30j', '3m', '1an'].map((r) => (
+        {[
+          { id: '7j', label: '7 jours' },
+          { id: '30j', label: '1 mois' },
+          { id: '3m', label: '3 mois' },
+          { id: '6m', label: '6 mois' },
+          { id: '1an', label: '1 an' }
+        ].map((r) => (
           <button
-            key={r}
-            onClick={() => setRange(r)}
-            className={`px-6 py-2 rounded-full text-xs font-black tracking-widest uppercase transition-all shrink-0 ${
-              range === r ? 'bg-primary text-background-dark' : 'bg-surface-dark text-text-secondary'
+            key={r.id}
+            onClick={() => setRange(r.id)}
+            className={`px-5 py-2 rounded-full text-[10px] font-black tracking-widest uppercase transition-all shrink-0 ${
+              range === r.id ? 'bg-primary text-background-dark shadow-lg shadow-primary/20' : 'bg-surface-dark text-text-secondary border border-white/5'
             }`}
           >
-            {r === '30j' ? '30 Jours' : r.toUpperCase()}
+            {r.label}
           </button>
         ))}
       </div>
@@ -153,10 +185,12 @@ const HealthTracking: React.FC = () => {
                 <span className="size-2 rounded-full bg-primary"></span>
                 <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary">Poids</p>
               </div>
-              <p className="text-4xl font-black">{user.weight} <span className="text-lg font-medium text-text-secondary">kg</span></p>
+              <p className="text-4xl font-black">{latestMetric.weight} <span className="text-lg font-medium text-text-secondary">kg</span></p>
             </div>
             <div className="text-right">
-              <span className="bg-green-500/10 text-green-500 px-2 py-1 rounded-md text-[10px] font-black">Stable</span>
+              <span className={`px-2 py-1 rounded-md text-[10px] font-black tracking-widest uppercase border border-white/5 ${weightTrend.color}`}>
+                {weightTrend.label}
+              </span>
               <p className="text-[9px] text-text-secondary mt-1 font-bold">vs mesure précédente</p>
             </div>
           </div>

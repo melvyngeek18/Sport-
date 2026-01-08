@@ -67,6 +67,11 @@ async function decodeAudioData(data: Uint8Array, ctx: AudioContext, sampleRate: 
 
 export const speakEncouragement = async (text: string) => {
   try {
+    // Récupérer les préférences utilisateur du localStorage pour le service
+    const savedUser = localStorage.getItem('firefit_user');
+    const userVoice = savedUser ? JSON.parse(savedUser).voicePreference : 'male';
+    const voiceName = userVoice === 'female' ? 'Puck' : 'Kore';
+
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-preview-tts",
       contents: [{ parts: [{ text: `D'une voix de coach sportif motivant, dis : ${text}` }] }],
@@ -74,7 +79,7 @@ export const speakEncouragement = async (text: string) => {
         responseModalities: [Modality.AUDIO],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Kore' },
+            prebuiltVoiceConfig: { voiceName: voiceName },
           },
         },
       },

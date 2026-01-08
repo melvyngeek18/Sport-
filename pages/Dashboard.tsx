@@ -1,23 +1,37 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, userProgram } = useUser();
   const [showReminder, setShowReminder] = useState(false);
 
-  // Simulation du rappel de 12h00
+  // Calcul du ratio de progression
+  const workoutProgress = useMemo(() => {
+    const completed = userProgram.filter(w => w.status === 'completed').length;
+    const total = userProgram.length;
+    return { completed, total, percent: total > 0 ? Math.round((completed / total) * 100) : 0 };
+  }, [userProgram]);
+
+  // Simulation du rappel basé sur l'heure choisie par l'utilisateur
   useEffect(() => {
     if (user.notificationsEnabled) {
       const now = new Date();
-      // On simule : si l'heure est entre 12h00 et 13h00, on affiche un bandeau de rappel
-      if (now.getHours() === 12) {
+      const currentHours = now.getHours();
+      
+      const [reminderHours] = user.reminderTime.split(':').map(Number);
+      
+      if (currentHours === reminderHours) {
         setShowReminder(true);
+      } else {
+        setShowReminder(false);
       }
+    } else {
+      setShowReminder(false);
     }
-  }, [user.notificationsEnabled]);
+  }, [user.notificationsEnabled, user.reminderTime]);
 
   return (
     <div className="flex-1 pb-24 px-4 overflow-y-auto no-scrollbar">
@@ -28,19 +42,21 @@ const Dashboard: React.FC = () => {
           <h1 className="text-xl font-bold tracking-tight">FireFit Ops</h1>
         </div>
         <button className="relative p-2 rounded-full hover:bg-white/5 transition-colors">
-          <span className="material-symbols-outlined text-text-secondary">notifications</span>
-          {user.notificationsEnabled && <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-background-dark"></span>}
+          <span className="material-symbols-outlined text-text-secondary">fact_check</span>
+          <span className="absolute -top-0.5 -right-1 flex items-center justify-center bg-primary text-[8px] font-black text-white min-w-[20px] h-[16px] px-1.5 rounded-full border border-background-dark shadow-lg ring-1 ring-white/10 animate-in zoom-in duration-300">
+            {workoutProgress.completed}/{workoutProgress.total}
+          </span>
         </button>
       </header>
 
-      {/* Rappel de 12h00 */}
+      {/* Bandeau de rappel personnalisé */}
       {showReminder && (
         <div className="mt-4 bg-primary p-4 rounded-2xl flex items-center justify-between shadow-xl animate-bounce">
           <div className="flex items-center gap-3">
              <span className="material-symbols-outlined text-background-dark font-black">alarm</span>
              <div>
-               <p className="text-background-dark font-black text-sm uppercase leading-none">Rappel de 12:00</p>
-               <p className="text-background-dark/80 text-[10px] font-bold">C'est l'heure de votre séance Cycle 1 !</p>
+               <p className="text-background-dark font-black text-sm uppercase leading-none">Rappel de {user.reminderTime}</p>
+               <p className="text-background-dark/80 text-[10px] font-bold">Soldat, c'est l'heure de votre entraînement !</p>
              </div>
           </div>
           <button onClick={() => setShowReminder(false)} className="text-background-dark">
@@ -56,10 +72,10 @@ const Dashboard: React.FC = () => {
             <h3 className="text-sm font-black uppercase tracking-widest text-primary">Cycle 1 : Relance</h3>
             <p className="text-[10px] text-text-secondary font-bold">Semaine 2 / 24 • Mois 1</p>
           </div>
-          <span className="text-xl font-black text-white">8%</span>
+          <span className="text-xl font-black text-white">{workoutProgress.percent}%</span>
         </div>
         <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-          <div className="h-full bg-primary rounded-full" style={{ width: '8%' }}></div>
+          <div className="h-full bg-primary rounded-full transition-all duration-1000" style={{ width: `${workoutProgress.percent}%` }}></div>
         </div>
       </section>
 
@@ -129,7 +145,7 @@ const Dashboard: React.FC = () => {
         >
           <div 
             className="absolute inset-0 bg-cover bg-center z-0 opacity-40 group-hover:scale-105 transition-transform duration-700" 
-            style={{ backgroundImage: "url('https://picsum.photos/seed/squat/800/400')" }}
+            style={{ backgroundImage: "url('https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=800')" }}
           ></div>
           <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/70 to-transparent z-10"></div>
           

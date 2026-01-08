@@ -48,9 +48,17 @@ const Profile: React.FC = () => {
     updateUser({ notificationsEnabled: newVal });
   };
 
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateUser({ reminderTime: e.target.value });
+  };
+
   const toggleAudio = () => {
     const newVal = !user.guidageAudioEnabled;
     updateUser({ guidageAudioEnabled: newVal });
+  };
+
+  const setVoice = (voice: 'male' | 'female') => {
+    updateUser({ voicePreference: voice });
   };
 
   return (
@@ -114,18 +122,19 @@ const Profile: React.FC = () => {
       </div>
 
       {/* Settings Section */}
-      <div className="px-4 space-y-6">
+      <div className="px-4 space-y-6 pb-12">
         <div>
           <h4 className="text-lg font-bold mb-4 ml-2">Préférences Opérationnelles</h4>
           <div className="space-y-3">
+            {/* Notification Toggle Row */}
             <div className="bg-surface-dark p-4 rounded-2xl border border-white/5 flex items-center justify-between shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                   <span className="material-symbols-outlined">notifications_active</span>
                 </div>
                 <div>
-                  <p className="text-sm font-bold">Rappels (12h00)</p>
-                  <p className="text-[10px] text-text-secondary">Notification d'entraînement</p>
+                  <p className="text-sm font-bold">Rappels d'entraînement</p>
+                  <p className="text-[10px] text-text-secondary">Notification quotidienne</p>
                 </div>
               </div>
               <button 
@@ -136,22 +145,69 @@ const Profile: React.FC = () => {
               </button>
             </div>
 
-            <div className="bg-surface-dark p-4 rounded-2xl border border-white/5 flex items-center justify-between shadow-sm">
-              <div className="flex items-center gap-4">
-                <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                  <span className="material-symbols-outlined">campaign</span>
+            {/* Time Selector Row (Visible only if notifications are on) */}
+            {user.notificationsEnabled && (
+              <div className="bg-surface-dark p-4 rounded-2xl border border-white/5 flex items-center justify-between shadow-sm animate-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center gap-4">
+                  <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <span className="material-symbols-outlined">schedule</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold">Heure du rappel</p>
+                    <p className="text-[10px] text-text-secondary">Actuellement à {user.reminderTime}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-bold">Guidage Audio IA</p>
-                  <p className="text-[10px] text-text-secondary">Coach vocal par Gemini</p>
-                </div>
+                <input 
+                  type="time" 
+                  value={user.reminderTime}
+                  onChange={handleTimeChange}
+                  className="bg-background-dark border border-white/10 rounded-lg px-3 py-1.5 text-sm font-bold text-white outline-none focus:border-primary transition-colors"
+                />
               </div>
-              <button 
-                onClick={toggleAudio}
-                className={`w-12 h-6 rounded-full relative p-1 transition-colors flex items-center ${user.guidageAudioEnabled ? 'bg-primary justify-end' : 'bg-white/10 justify-start'}`}
-              >
-                <div className="size-4 bg-white rounded-full shadow-sm"></div>
-              </button>
+            )}
+
+            {/* Guidage Audio IA Toggle Row */}
+            <div className="bg-surface-dark p-4 rounded-2xl border border-white/5 flex flex-col shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <span className="material-symbols-outlined">campaign</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold">Guidage Audio IA</p>
+                    <p className="text-[10px] text-text-secondary">Coach vocal par Gemini</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={toggleAudio}
+                  className={`w-12 h-6 rounded-full relative p-1 transition-colors flex items-center ${user.guidageAudioEnabled ? 'bg-primary justify-end' : 'bg-white/10 justify-start'}`}
+                >
+                  <div className="size-4 bg-white rounded-full shadow-sm"></div>
+                </button>
+              </div>
+
+              {/* Voice Preference Choice */}
+              {user.guidageAudioEnabled && (
+                <div className="mt-4 pt-4 border-t border-white/5 flex flex-col gap-3 animate-in slide-in-from-top-2 duration-300">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary ml-1">Genre de la voix</p>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setVoice('male')}
+                      className={`flex-1 py-3 rounded-xl border font-bold text-sm flex items-center justify-center gap-2 transition-all ${user.voicePreference === 'male' ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'bg-background-dark border-white/10 text-text-secondary hover:bg-white/5'}`}
+                    >
+                      <span className="material-symbols-outlined text-lg">male</span>
+                      Homme
+                    </button>
+                    <button 
+                      onClick={() => setVoice('female')}
+                      className={`flex-1 py-3 rounded-xl border font-bold text-sm flex items-center justify-center gap-2 transition-all ${user.voicePreference === 'female' ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'bg-background-dark border-white/10 text-text-secondary hover:bg-white/5'}`}
+                    >
+                      <span className="material-symbols-outlined text-lg">female</span>
+                      Femme
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

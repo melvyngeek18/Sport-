@@ -11,6 +11,7 @@ interface UserContextType {
   addHealthMetric: (metric: HealthMetric) => void;
   initializeProfile: (data: Partial<UserProfile>) => void;
   updateWorkoutStatus: (id: string, status: WorkoutStatus, newDate?: string) => void;
+  replaceWorkout: (id: string, workoutData: Partial<Workout>) => void;
 }
 
 const defaultUser: UserProfile = {
@@ -23,6 +24,8 @@ const defaultUser: UserProfile = {
   photoUrl: 'https://picsum.photos/seed/firefighter/200/200',
   notificationsEnabled: true,
   guidageAudioEnabled: true,
+  voicePreference: 'male',
+  reminderTime: '12:00',
   isInitialized: false
 };
 
@@ -100,8 +103,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     ));
   };
 
+  const replaceWorkout = (id: string, workoutData: Partial<Workout>) => {
+    setUserProgram(prev => prev.map(w => 
+      w.id === id ? { ...w, ...workoutData } : w
+    ));
+  };
+
   return (
-    <UserContext.Provider value={{ user, healthHistory, userProgram, updateUser, addHealthMetric, initializeProfile, updateWorkoutStatus }}>
+    <UserContext.Provider value={{ user, healthHistory, userProgram, updateUser, addHealthMetric, initializeProfile, updateWorkoutStatus, replaceWorkout }}>
       {children}
     </UserContext.Provider>
   );

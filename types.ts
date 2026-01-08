@@ -49,6 +49,8 @@ export interface UserProfile {
   photoUrl: string;
   notificationsEnabled: boolean;
   guidageAudioEnabled: boolean;
+  voicePreference: 'male' | 'female';
+  reminderTime: string;
   isInitialized: boolean;
 }
 
@@ -57,5 +59,6 @@ export enum NavigationTab {
   TRAINING = 'training',
   HISTORY = 'history',
   HEALTH = 'health',
-  PROFILE = 'profile'
+  PROFILE = 'profile',
+  QUIT = 'quit'
 }

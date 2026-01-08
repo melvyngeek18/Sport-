@@ -100,7 +100,7 @@ const ActiveSession: React.FC = () => {
       <div className="relative w-full rounded-2xl overflow-hidden shadow-lg bg-surface-dark mb-6 mt-4">
         <div 
           className="absolute inset-0 bg-cover bg-center" 
-          style={{ backgroundImage: "url('https://picsum.photos/seed/burpees/800/400')" }}
+          style={{ backgroundImage: "url('https://images.pexels.com/photos/3768916/pexels-photo-3768916.jpeg?auto=compress&cs=tinysrgb&w=800')" }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
         <div className="relative p-6 flex flex-col h-full min-h-[160px] justify-end">

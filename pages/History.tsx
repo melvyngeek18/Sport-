@@ -134,7 +134,7 @@ const History: React.FC = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background-dark/90 backdrop-blur-xl animate-in fade-in duration-200">
           <div className="w-full max-w-sm bg-surface-dark border border-white/10 rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in slide-in-from-bottom-8 duration-300">
             {/* Header with Background */}
-            <div className="relative h-32 bg-primary flex flex-col items-center justify-center text-background-dark">
+            <div className="relative h-32 bg-primary flex flex-col items-center justify-center text-white">
               <div className="absolute top-4 right-4">
                 <button onClick={closeSummary} className="size-8 rounded-full bg-background-dark/10 flex items-center justify-center">
                    <span className="material-symbols-outlined font-bold">close</span>
@@ -182,7 +182,7 @@ const History: React.FC = () => {
               {/* Close Button */}
               <button 
                 onClick={closeSummary}
-                className="w-full bg-white text-background-dark py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl active:scale-95 transition-all mt-4"
+                className="w-full bg-primary text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl active:scale-95 transition-all mt-4"
               >
                 Quitter
               </button>
