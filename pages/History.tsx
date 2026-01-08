@@ -74,8 +74,8 @@ const History: React.FC = () => {
       {/* AppBar */}
       <div className="sticky top-0 z-40 bg-background-dark/95 backdrop-blur-md p-4 pb-3 flex items-center justify-between border-b border-white/5">
         <h2 className="text-2xl font-bold tracking-tight">Historique</h2>
-        <button className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-          <span className="material-symbols-outlined">tune</span>
+        <button className="size-10 rounded-full bg-white/5 flex items-center justify-center text-text-secondary">
+          <span className="material-symbols-outlined">calendar_month</span>
         </button>
       </div>
 
