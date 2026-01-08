@@ -1,14 +1,16 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { HealthMetric, UserProfile } from '../types';
-import { MOCK_HEALTH_DATA } from '../constants';
+import { HealthMetric, UserProfile, Workout, WorkoutStatus } from '../types';
+import { MOCK_WORKOUTS } from '../constants';
 
 interface UserContextType {
   user: UserProfile;
   healthHistory: HealthMetric[];
+  userProgram: Workout[];
   updateUser: (newData: Partial<UserProfile>) => void;
   addHealthMetric: (metric: HealthMetric) => void;
   initializeProfile: (data: Partial<UserProfile>) => void;
+  updateWorkoutStatus: (id: string, status: WorkoutStatus, newDate?: string) => void;
 }
 
 const defaultUser: UserProfile = {
@@ -20,7 +22,7 @@ const defaultUser: UserProfile = {
   objective: 'Relance cardio & Perte de poids',
   photoUrl: 'https://picsum.photos/seed/firefighter/200/200',
   notificationsEnabled: true,
-  guidageAudioEnabled: false,
+  guidageAudioEnabled: true,
   isInitialized: false
 };
 
@@ -34,8 +36,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [healthHistory, setHealthHistory] = useState<HealthMetric[]>(() => {
     const saved = localStorage.getItem('firefit_history');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [userProgram, setUserProgram] = useState<Workout[]>(() => {
+    const saved = localStorage.getItem('firefit_program');
     if (saved) return JSON.parse(saved);
-    // On ne met pas de mock data par défaut si l'utilisateur n'est pas initialisé
     return [];
   });
 
@@ -46,6 +52,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     localStorage.setItem('firefit_history', JSON.stringify(healthHistory));
   }, [healthHistory]);
+
+  useEffect(() => {
+    localStorage.setItem('firefit_program', JSON.stringify(userProgram));
+  }, [userProgram]);
 
   const updateUser = (newData: Partial<UserProfile>) => {
     setUser(prev => ({ ...prev, ...newData }));
@@ -60,18 +70,38 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const newUser = { ...user, ...data, isInitialized: true };
     setUser(newUser);
     
-    // Créer la première mesure de référence dans l'historique
+    // Génération d'un programme de base à partir des mocks
+    const today = new Date();
+    const generatedProgram: Workout[] = MOCK_WORKOUTS.map((w, i) => {
+      const workoutDate = new Date(today);
+      workoutDate.setDate(today.getDate() + (i * 2)); // Séance tous les 2 jours
+      return {
+        ...w,
+        id: `pw-${i}`,
+        date: workoutDate.toISOString().split('T')[0],
+        status: 'scheduled' as WorkoutStatus,
+        timerType: i === 0 ? 'AMRAP' : (i === 1 ? 'EMOM' : 'TABATA')
+      };
+    });
+    setUserProgram(generatedProgram);
+
     const initialMetric: HealthMetric = {
       date: new Date().toISOString().split('T')[0],
       weight: parseFloat(data.weight || '0'),
-      heartRate: 60, // Valeur par défaut
-      bloodPressure: { systolic: 120, diastolic: 80 } // Valeur par défaut
+      heartRate: 60,
+      bloodPressure: { systolic: 120, diastolic: 80 }
     };
     setHealthHistory([initialMetric]);
   };
 
+  const updateWorkoutStatus = (id: string, status: WorkoutStatus, newDate?: string) => {
+    setUserProgram(prev => prev.map(w => 
+      w.id === id ? { ...w, status, date: newDate || w.date } : w
+    ));
+  };
+
   return (
-    <UserContext.Provider value={{ user, healthHistory, updateUser, addHealthMetric, initializeProfile }}>
+    <UserContext.Provider value={{ user, healthHistory, userProgram, updateUser, addHealthMetric, initializeProfile, updateWorkoutStatus }}>
       {children}
     </UserContext.Provider>
   );

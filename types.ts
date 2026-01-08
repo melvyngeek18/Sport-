@@ -1,8 +1,12 @@
 
+export type WorkoutStatus = 'scheduled' | 'completed' | 'cancelled' | 'rescheduled';
+export type TimerType = 'STANDARD' | 'AMRAP' | 'TABATA' | 'EMOM' | 'WARMUP' | 'STRETCHING';
+
 export interface Workout {
   id: string;
   title: string;
   type: string;
+  timerType: TimerType;
   duration: string;
   intensity: 'Léger' | 'Modéré' | 'Intense';
   date: string;
@@ -14,6 +18,7 @@ export interface Workout {
   wod: string[];
   cooldown: string[];
   imageUrl?: string;
+  status: WorkoutStatus;
 }
 
 export interface Exercise {

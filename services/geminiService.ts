@@ -1,7 +1,8 @@
 
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Strictly follow the SDK initialization guidelines
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const getHealthInsights = async (healthData: any[]) => {
   try {

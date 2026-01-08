@@ -18,6 +18,9 @@ export const MOCK_WORKOUTS: Workout[] = [
     id: 'c1-s1',
     title: 'Force Bas du Corps + Metcon',
     type: 'CrossFit',
+    // Fix missing timerType and status properties to satisfy the Workout interface
+    timerType: 'AMRAP',
+    status: 'scheduled',
     duration: '60 min',
     intensity: 'Intense',
     date: '2023-10-24',
@@ -34,6 +37,9 @@ export const MOCK_WORKOUTS: Workout[] = [
     id: 'c1-s2',
     title: 'Running Endurance',
     type: 'Cardio',
+    // Fix missing timerType and status properties to satisfy the Workout interface
+    timerType: 'STANDARD',
+    status: 'scheduled',
     duration: '50 min',
     intensity: 'Modéré',
     date: '2023-10-25',
@@ -49,6 +55,9 @@ export const MOCK_WORKOUTS: Workout[] = [
     id: 'c1-s3',
     title: 'Gym / Haut du Corps',
     type: 'CrossFit',
+    // Fix missing timerType and status properties to satisfy the Workout interface
+    timerType: 'AMRAP',
+    status: 'scheduled',
     duration: '45 min',
     intensity: 'Intense',
     date: '2023-10-26',
