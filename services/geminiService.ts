@@ -1,6 +1,5 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 
-// Initialisation de l'IA avec la clé d'API
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
@@ -32,17 +31,17 @@ export const getHealthInsights = async (healthData: any[]) => {
 };
 
 /**
- * Génère un message d'encouragement court pendant l'exercice.
+ * Génère un message d'encouragement dynamique pour la synthèse vocale.
  */
-export const getAIVoiceCoach = async (prompt: string) => {
+export const getAIVoiceCoach = async (context: string) => {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `En tant que coach expert pour pompiers, donne un message d'encouragement très court (10 mots max) pour : ${prompt}.`,
+      contents: `En tant que coach expert pour pompiers, donne un message d'encouragement ou un conseil technique très court (maximum 12 mots) pour la situation suivante : ${context}. Sois motivant et autoritaire.`,
     });
     return response.text;
   } catch (error) {
-    return "Allez, on lâche rien, soldat !";
+    return "Allez soldat, on maintient l'effort !";
   }
 };
 
@@ -76,29 +75,14 @@ export const getWorkoutAnalysis = async (workout: any) => {
   } catch (error) {
     console.error("Workout Analysis Error:", error);
     return {
-      summary: "Belle séance effectuée avec rigularité. La condition opérationnelle se maintient.",
-      tips: ["Concentrez-vous sur la qualité du mouvement plutôt que la vitesse.", "Intégrez plus de mobilité articulaire en fin de séance."]
+      summary: "Belle séance effectuée avec régularité.",
+      tips: ["Gardez le dos droit sur les charges.", "Travaillez votre souffle."]
     };
   }
 };
 
-// --- AUDIO TTS (TEXT-TO-SPEECH) LOGIC ---
+// --- AUDIO TTS LOGIC ---
 
-/**
- * Encode des octets en chaîne Base64 (nécessaire pour le SDK).
- */
-function encode(bytes: Uint8Array) {
-  let binary = '';
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
-
-/**
- * Décode une chaîne Base64 en tableau d'octets.
- */
 function decode(base64: string) {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -109,9 +93,6 @@ function decode(base64: string) {
   return bytes;
 }
 
-/**
- * Décode les données audio PCM brutes renvoyées par l'API en AudioBuffer.
- */
 async function decodeAudioData(
   data: Uint8Array,
   ctx: AudioContext,
@@ -132,11 +113,10 @@ async function decodeAudioData(
 }
 
 /**
- * Utilise Gemini TTS pour lire un texte avec la voix choisie par l'utilisateur.
+ * Lit un texte avec la voix Gemini TTS.
  */
 export const speakEncouragement = async (text: string) => {
   try {
-    // Récupérer les préférences de voix (Kore = Homme, Puck = Femme par défaut dans cet exemple)
     const savedUser = localStorage.getItem('firefit_user');
     const userVoice = savedUser ? JSON.parse(savedUser).voicePreference : 'male';
     const voiceName = userVoice === 'female' ? 'Puck' : 'Kore';
@@ -169,6 +149,6 @@ export const speakEncouragement = async (text: string) => {
       source.start();
     }
   } catch (error) {
-    console.error("TTS Synthesis Error:", error);
+    console.error("TTS Error:", error);
   }
 };

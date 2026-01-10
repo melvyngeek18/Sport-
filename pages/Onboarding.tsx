@@ -1,19 +1,32 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 
 const Onboarding: React.FC = () => {
   const { initializeProfile } = useUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
+  const [showExistingProfile, setShowExistingProfile] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     rank: 'Caporal',
     age: '30',
     weight: '80',
     height: '180',
-    photoUrl: 'https://img.freepik.com/vecteurs-premium/concept-logo-lettre-s-feu-abstrait_73229-456.jpg', // Logo SC par défaut
+    photoUrl: 'https://img.freepik.com/vecteurs-premium/concept-logo-lettre-s-feu-abstrait_73229-456.jpg', 
   });
+
+  // Détection du profil au montage
+  useEffect(() => {
+    const saved = localStorage.getItem('firefit_user');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.name && parsed.name.trim() !== '') {
+        setFormData(parsed);
+        setShowExistingProfile(true);
+      }
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,9 +53,58 @@ const Onboarding: React.FC = () => {
   const handleSubmit = () => {
     initializeProfile({
       ...formData,
-      objective: 'Relance cardio & Technique (Cycle 1)'
+      objective: formData.objective || 'Relance cardio & Technique (Cycle 1)'
     });
   };
+
+  const handleResetProfile = () => {
+    setShowExistingProfile(false);
+    setFormData({
+      name: '',
+      rank: 'Sapeur',
+      age: '30',
+      weight: '80',
+      height: '180',
+      photoUrl: 'https://img.freepik.com/vecteurs-premium/concept-logo-lettre-s-feu-abstrait_73229-456.jpg',
+    });
+    setStep(1);
+  };
+
+  // Écran "Ravi de vous revoir"
+  if (showExistingProfile) {
+    return (
+      <div className="flex-1 flex flex-col bg-background-dark p-6 justify-center animate-in fade-in duration-700">
+        <div className="mb-10 text-center">
+          <span className="material-symbols-outlined text-primary text-7xl mb-4 filled">account_circle</span>
+          <h1 className="text-3xl font-black uppercase tracking-tighter">Ravi de vous revoir</h1>
+          <p className="text-text-secondary text-sm mt-1">Identité opérationnelle détectée.</p>
+        </div>
+
+        <div className="bg-surface-dark border border-white/5 rounded-[40px] p-8 shadow-2xl flex flex-col items-center">
+          <div className="w-32 h-32 rounded-full border-4 border-primary overflow-hidden mb-6 shadow-xl shadow-primary/10">
+            <img src={formData.photoUrl} alt="Detected Profile" className="w-full h-full object-cover" />
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">{formData.rank}</p>
+          <h2 className="text-2xl font-black text-white mb-8">{formData.name}</h2>
+          
+          <div className="w-full space-y-4">
+            <button 
+              onClick={handleSubmit} 
+              className="w-full bg-primary text-background-dark font-black py-5 rounded-2xl shadow-xl shadow-primary/30 active:scale-95 text-lg transition-all"
+            >
+              PRENDRE LA GARDE
+            </button>
+            <button 
+              onClick={handleResetProfile} 
+              className="w-full bg-white/5 border border-white/10 text-text-secondary font-black py-4 rounded-2xl text-xs uppercase tracking-widest active:scale-95 transition-all"
+            >
+              UTILISER UN AUTRE PROFIL
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col bg-background-dark p-6 justify-center">
@@ -59,7 +121,6 @@ const Onboarding: React.FC = () => {
           <div className="space-y-6 animate-in slide-in-from-right duration-300">
             <h2 className="text-xl font-bold text-center">Qui êtes-vous ?</h2>
             
-            {/* Photo Upload Section avec Logo SC par défaut */}
             <div className="flex flex-col items-center gap-3">
               <div className="relative group cursor-pointer" onClick={handlePhotoClick}>
                 <div className="w-28 h-28 rounded-full border-4 border-primary/30 overflow-hidden bg-background-dark flex items-center justify-center shadow-inner">
@@ -73,7 +134,7 @@ const Onboarding: React.FC = () => {
                   <span className="material-symbols-outlined text-sm font-bold">photo_camera</span>
                 </div>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-primary">Changer la photo (Logo SC actuel)</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-primary">Changer la photo</p>
               <input 
                 type="file" 
                 ref={fileInputRef} 
